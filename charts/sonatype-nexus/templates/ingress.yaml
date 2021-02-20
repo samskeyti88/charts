@@ -15,6 +15,14 @@ metadata:
     {{- end }}
 spec:
   rules:
+    {{- range .Values.nexus.hosts }}
+    - host: {{ .host }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ template "nexus.name" $ }}-service
+              servicePort: {{ .port}}
+    {{- end }}
 {{- if .Values.nexusProxy.env.nexusHttpHost }}
     - host: {{ .Values.nexusProxy.env.nexusHttpHost }}
       http:
