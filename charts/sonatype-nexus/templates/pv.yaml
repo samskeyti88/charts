@@ -1,4 +1,3 @@
-{{- if not .Values.statefulset.enabled }}
 {{- if .Values.persistence.pdName -}}
 apiVersion: v1
 kind: PersistentVolume
@@ -8,13 +7,19 @@ metadata:
   labels:
 {{ include "nexus.labels" . | indent 4 }}
 spec:
+  storageClassName: "{{ .Values.persistence.storageClass }}"
   capacity:
     storage: {{ .Values.persistence.storageSize }}
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.persistence.accessMode | quote }}
   claimRef:
     namespace: {{ .Release.Namespace }}
     name: {{ template "nexus.fullname" . }}-data
+{{- if .Values.persistence.csi }}
+  volumeMode: Filesystem
+  csi:
+{{ toYaml .Values.persistence.csi | indent 4 }}
+{{- else }}
   gcePersistentDisk:
     pdName: {{ .Values.persistence.pdName }}
     fsType: {{ .Values.persistence.fsType }}

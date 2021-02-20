@@ -1,0 +1,33 @@
+statefulset:
+  enabled: true
+nexus:
+  hosts:
+    - host: d7f12bb1-default-sonatypen-b1d4-346587062.ap-northeast-1.elb.amazonaws.com
+      port: 8081
+nexusProxy:
+  enabled: false
+persistence:
+  enabled: true
+  accessMode: ReadWriteMany
+  existingClaim: false
+  storageClass: efs-sc
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-ed6da4cd::fsap-070d6f44804520cd6
+  pdName: efs
+ingress:
+  enabled: true
+  path: /
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  tls:
+    enabled: false
+service:
+  enabled: true
+  type: NodePort
+  ports:
+    - name: port-8081
+      port: 8081
+      targetPort: 8081
